@@ -1,0 +1,9 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Courses - ExamSlot</title><script src="../../js/theme.js"></script><link rel="stylesheet" href="../../css/style.css"></head><body><div id="app"></div><script src="../../js/data.js"></script><script src="../../js/app.js"></script><script>
+page('admin','courses',(m,D)=>{const ns=id=>D.slots.filter(s=>s.courseId==id).length,nst=id=>D.students.filter(s=>s.courses.includes(id)).length;
+ list(m,{title:'Courses',sub:'Manage the course catalogue',add:'course-form.html',addL:'Add Course',rows:()=>D.courses,keys:r=>r.code+r.title+r.dept,
+ filters:[{l:'Department',o:[...new Set(D.courses.map(c=>c.dept))],f:r=>r.dept},{l:'Status',o:['Active','Inactive'],f:r=>r.active?'Active':'Inactive'}],
+ cols:[['Code',r=>r.code],['Title',r=>r.title],['Cr.',r=>r.cr],['Department',r=>r.dept],['Slots',r=>ns(r.id)],['Students',r=>nst(r.id)],['Status',r=>r.active?bdg('Active','ok'):bdg('Inactive')]],
+ act:r=>`<a class="btn s" href="course-form.html?id=${r.id}">Edit</a><button class="btn s" data-a="d" data-id="${r.id}">Delete</button>`,
+ on:(a,id,draw)=>{const r=D.courses.find(x=>x.id==id),a1=nst(id),a2=ns(id);
+  delFlow(r.code,a1||a2?`Assigned to ${a1} students and has ${a2} slots.`:'',()=>{r.active=false;done(D,draw,'Course marked inactive')},()=>{D.courses=D.courses.filter(x=>x!==r);done(D,draw,'Course deleted')})}})});
+</script></body></html>

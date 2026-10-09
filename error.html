@@ -1,0 +1,4 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Error - ExamSlot</title><script src="../../js/theme.js"></script><link rel="stylesheet" href="../../css/style.css"></head><body><div id="app"></div><script src="../../js/data.js"></script><script src="../../js/app.js"></script><script>
+const c=Q.get('code')||'404',T={401:['Session expired','Please sign in again.'],403:['Access denied','You do not have permission.'],404:['Page not found','This page does not exist.']}[c]||['Error',''];const u=me();
+$('#app').innerHTML=`${themeBtn('auth-theme')}<div class="auth"><div class="card ctr"><h1 style="font-size:56px">${esc(c)}</h1><h2>${T[0]}</h2><p class="mu">${T[1]}</p><a class="btn p" style="width:100%" href="${c==401||!u?'login.html':'../'+home(u)}">${c==401||!u?'Sign in':'Go to my home'}</a></div></div>`;
+</script></body></html>

@@ -1,0 +1,9 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Students - ExamSlot</title><script src="../../js/theme.js"></script><link rel="stylesheet" href="../../css/style.css"></head><body><div id="app"></div><script src="../../js/data.js"></script><script src="../../js/app.js"></script><script>
+page('admin','students',(m,D)=>{const br=s=>(D.branches.find(b=>b.id==s.branchId)||{}).name||'-';
+ list(m,{title:'Students',sub:'Create and manage student accounts',add:'student-form.html',addL:'Add Student',rows:()=>D.students,keys:r=>r.name+r.email+r.reg+r.cnic,
+ filters:[{l:'Program',o:[...new Set(D.students.map(s=>s.program))],f:r=>r.program},{l:'Account',o:['Invite sent','Active','Inactive'],f:r=>({invite:'Invite sent',active:'Active'}[r.status]||'Inactive')},{l:'Sheet',o:['Saved','In progress','Not started','Incomplete'],f:sheetSt}],
+ cols:[['Reg No',r=>r.reg],['Name',r=>`<a href="student-detail.html?id=${r.id}">${esc(r.name)}</a>`],['Program',r=>r.program],['Branch',br],['Courses',r=>`<b style="color:${r.courses.length<4?'var(--er)':'inherit'}">${r.courses.length}/6</b>`],['Account',acct],['Date sheet',r=>bdg(sheetSt(r),sheetSt(r)=='Saved'?'ok':sheetSt(r)=='Incomplete'?'er':'')]],
+ act:r=>`<a class="btn s" href="student-detail.html?id=${r.id}">View</a><a class="btn s" href="student-form.html?id=${r.id}">Edit</a><button class="btn s" data-a="d" data-id="${r.id}">Delete</button>`,
+ on:(a,id,draw)=>{const r=D.students.find(x=>x.id==id);
+  delFlow(r.name,r.sheetSaved?'This student has saved a date sheet.':'',()=>{r.status='inactive';done(D,draw,'Student marked inactive')},()=>{D.students=D.students.filter(x=>x!==r);done(D,draw,'Student deleted')})}})});
+</script></body></html>

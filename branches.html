@@ -1,0 +1,9 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Branches - ExamSlot</title><script src="../../js/theme.js"></script><link rel="stylesheet" href="../../css/style.css"></head><body><div id="app"></div><script src="../../js/data.js"></script><script src="../../js/app.js"></script><script>
+page('admin','branches',(m,D)=>{const n=id=>D.students.filter(s=>s.branchId==id).length;
+ list(m,{title:'Branches',sub:'Manage exam campuses',add:'branch-form.html',addL:'Add Branch',rows:()=>D.branches,keys:r=>r.name+r.code+r.city,
+ filters:[{l:'Status',o:['Active','Inactive'],f:r=>r.active?'Active':'Inactive'}],
+ cols:[['Code',r=>r.code],['Name',r=>r.name],['City',r=>r.city],['Contact',r=>r.phone],['Students',r=>n(r.id)],['Status',r=>r.active?bdg('Active','ok'):bdg('Inactive')]],
+ act:r=>`<a class="btn s" href="branch-form.html?id=${r.id}">Edit</a><button class="btn s" data-a="d" data-id="${r.id}">Delete</button>`,
+ on:(a,id,draw)=>{const r=D.branches.find(x=>x.id==id),c=n(id);
+  delFlow(r.name,c?`${c} students have chosen this branch.`:'',()=>{r.active=false;done(D,draw,'Branch marked inactive')},()=>{D.branches=D.branches.filter(x=>x!==r);done(D,draw,'Branch deleted')})}})});
+</script></body></html>

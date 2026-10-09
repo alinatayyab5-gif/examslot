@@ -1,0 +1,10 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Course Form - ExamSlot</title><script src="../../js/theme.js"></script><link rel="stylesheet" href="../../css/style.css"></head><body><div id="app"></div><script src="../../js/data.js"></script><script src="../../js/app.js"></script><script>
+page('admin','courses',(m,D)=>{if(+Q.get('id')&&!D.courses.find(x=>x.id==+Q.get('id')))return location.href='../auth/error.html?code=404';const id=+Q.get('id'),r=D.courses.find(x=>x.id==id)||{},a=D.students.filter(s=>s.courses.includes(id)).length,sl=D.slots.filter(s=>s.courseId==id).length;
+ form(m,{title:id?'Edit Course':'Add Course',crumb:'Courses > '+(id?r.code:'Add'),back:'courses.html',btn:'Save Course',data:{...r,credit:r.cr||3,status:r.active===false?'Inactive':'Active'},
+ extra:id?`<div class="ban">Assigned to ${a} students, ${sl} exam slots. Delete is blocked while in use. Use Inactive to retire it.</div>`:'',
+ fields:[{n:'code',l:'Course code (unique)',req:1},{n:'title',l:'Course title',req:1},{n:'credit',l:'Credit hours',t:'select',o:[1,2,3,4,5,6]},{n:'dept',l:'Department',req:1,dl:[...new Set(D.courses.map(c=>c.dept))]},{n:'status',l:'Status',t:'select',o:['Active','Inactive']}],
+ save:v=>{const e={};if(!/^[A-Za-z0-9]{3,10}$/.test(v.code))e.code='3 to 10 letters or digits';else if(D.courses.some(c=>c.id!=id&&c.code.toLowerCase()==v.code.toLowerCase()))e.code='Course code already exists';
+  if(v.title.length<3||v.title.length>100)e.title='3 to 100 characters';if(Object.keys(e).length)return e;
+  Object.assign(r,{code:v.code.toUpperCase(),title:v.title,cr:+v.credit,dept:v.dept,active:v.status=='Active'});if(!id){r.id=nid(D.courses);D.courses.push(r)}
+  done(D,0,'Course saved');setTimeout(()=>location.href='courses.html',700)}})});
+</script></body></html>

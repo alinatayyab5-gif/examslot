@@ -1,0 +1,11 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Branch Form - ExamSlot</title><script src="../../js/theme.js"></script><link rel="stylesheet" href="../../css/style.css"></head><body><div id="app"></div><script src="../../js/data.js"></script><script src="../../js/app.js"></script><script>
+page('admin','branches',(m,D)=>{if(+Q.get('id')&&!D.branches.find(x=>x.id==+Q.get('id')))return location.href='../auth/error.html?code=404';const id=+Q.get('id'),r=D.branches.find(x=>x.id==id)||{},c=D.students.filter(s=>s.branchId==id).length;
+ form(m,{title:id?'Edit Branch':'Add Branch',crumb:'Branches > '+(id?r.name:'Add'),back:'branches.html',btn:'Save Branch',data:{...r,status:r.active===false?'Inactive':'Active'},
+ extra:id?`<div class="ban">Chosen by ${c} students. ${c?'Hard delete is blocked. Set Status to Inactive to hide it from the student picker.':'Can be deleted from the list.'}</div>`:'',
+ fields:[{n:'name',l:'Branch name',req:1},{n:'code',l:'Code (unique)',req:1},{n:'city',l:'City',req:1},{n:'phone',l:'Contact number',req:1,t:'tel'},{n:'address',l:'Address',req:1},{n:'status',l:'Status',t:'select',o:['Active','Inactive']}],
+ save:v=>{const e={};if(v.name.length<3||v.name.length>80)e.name='3 to 80 characters';
+  if(!/^[A-Za-z0-9-]{2,10}$/.test(v.code))e.code='2 to 10 letters, digits or hyphen';else if(D.branches.some(b=>b.id!=id&&b.code.toLowerCase()==v.code.toLowerCase()))e.code='Code already exists';
+  if(!/^[0-9+\- ]{7,15}$/.test(v.phone))e.phone='Invalid phone number';if(Object.keys(e).length)return e;
+  Object.assign(r,{name:v.name,code:v.code,city:v.city,phone:v.phone,address:v.address,active:v.status=='Active'});if(!id){r.id=nid(D.branches);D.branches.push(r)}
+  done(D,0,'Branch saved');setTimeout(()=>location.href='branches.html',700)}})});
+</script></body></html>

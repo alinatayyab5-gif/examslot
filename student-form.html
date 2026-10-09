@@ -1,0 +1,15 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Student Form - ExamSlot</title><script src="../../js/theme.js"></script><link rel="stylesheet" href="../../css/style.css"></head><body><div id="app"></div><script src="../../js/data.js"></script><script src="../../js/app.js"></script><script>
+page('admin','students',(m,D)=>{if(+Q.get('id')&&!D.students.find(x=>x.id==+Q.get('id')))return location.href='../auth/error.html?code=404';const id=+Q.get('id'),r=D.students.find(x=>x.id==id)||{};const T=(n,l,t)=>({n,l,t,req:1});
+ form(m,{title:id?'Edit Student':'Add Student',crumb:'Students > '+(id?r.name:'Add'),back:'students.html',btn:id?'Save':'Save and send invite',data:r,
+ extra:'<div class="ban">No password field. A setup link is emailed on save.</div>',
+ fields:[{g:'A. Personal'},T('name','Full name'),T('email','Email (unique)','email'),T('phone','Phone','tel'),T('cnic','CNIC / B-Form'),T('dob','Date of birth','date'),{n:'gender',l:'Gender',t:'select',o:['Male','Female','Other']},T('address','Address'),{n:'photo',l:'Profile photo (optional, JPG/PNG, max 2 MB)',t:'file'},
+ {g:'B. Parent / Guardian'},T('father','Father / guardian name'),T('pcnic','Parent CNIC'),T('occ','Occupation'),T('pphone','Contact number','tel'),T('emerg','Emergency contact','tel'),
+ {g:'C. Academic'},T('reg','Registration no (unique)'),T('program','Program / degree'),T('sem','Semester','number'),T('batch','Session / batch'),T('qual','Previous qualification'),T('inst','Previous institute'),T('cgpa','Marks / CGPA')],
+ save:v=>{const e={},c=/^\d{5}-\d{7}-\d$/;if(!c.test(v.cnic))e.cnic='Format #####-#######-#';if(!c.test(v.pcnic))e.pcnic='Format #####-#######-#';
+  if(D.students.some(s=>s.id!=id&&s.email==v.email.toLowerCase()))e.email='Email already exists';if(D.students.some(s=>s.id!=id&&s.reg.toLowerCase()==v.reg.toLowerCase()))e.reg='Registration no already exists';
+  if(v.dob>=new Date().toISOString().slice(0,10))e.dob='Must be in the past';if(v.sem<1||v.sem>12)e.sem='1 to 12';if(isNaN(v.cgpa)||v.cgpa<0||v.cgpa>100)e.cgpa='Enter CGPA (0-4) or a percentage (0-100)';['phone','pphone','emerg'].forEach(k=>{if(!/^[0-9+\- ]{7,15}$/.test(v[k]))e[k]='Invalid phone number'});if(Object.keys(e).length)return e;
+  const k={...v,email:v.email.toLowerCase(),sem:+v.sem},old=r.email;delete k.photo;
+  if(id)Object.assign(r,k);else{Object.assign(r,{id:nid(D.students),status:'invite',password:null,branchId:null,branchUnlock:false,sheetSaved:false,sheetUnlock:false,savedAt:null,courses:[],picks:{}},k);D.students.push(r)}
+  let t='';const fresh=!id||(r.status=='invite'&&old!=r.email);if(fresh)t=token(D,r.email,24);done(D,0,id?'Student saved':'Student created, invite sent to '+r.email);
+  if(fresh)modal(`<h3>${id?'New invite issued':'Student created'}</h3><p>Invite email would be sent now. Demo link (no email server yet):</p><p><a href="../auth/reset-password.html?token=${t}">Open password setup link</a></p>`,[['OK','p',()=>location.href='student-detail.html?id='+r.id]]);else setTimeout(()=>location.href='student-detail.html?id='+id,700)}})});
+</script></body></html>

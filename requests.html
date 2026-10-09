@@ -1,0 +1,12 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Requests - ExamSlot</title><script src="../../js/theme.js"></script><link rel="stylesheet" href="../../css/style.css"></head><body><div id="app"></div><script src="../../js/data.js"></script><script src="../../js/app.js"></script><script>
+page('admin','requests',(m,D)=>{const S=r=>D.students.find(s=>s.id==r.sid),T=r=>r.type=='branch'?'Change branch':'Change date sheet';
+ list(m,{title:'Student Requests',sub:'Approve or reject change requests',rows:()=>D.requests,keys:r=>S(r).name+S(r).reg,
+ filters:[{l:'Status',o:['pending','approved','rejected'],f:r=>r.status,d:'pending'},{l:'Type',o:['Change branch','Change date sheet'],f:T}],
+ cols:[['Student',r=>`<a href="student-detail.html?id=${r.sid}">${esc(S(r).name)}</a>`],['Reg No',r=>S(r).reg],['Type',r=>bdg(T(r),'i')],['Reason',r=>esc(r.reason)],['Raised',r=>fd(r.raised)],['Status',r=>bdg(r.status,r.status=='approved'?'ok':r.status=='pending'?'w':'er')]],
+ act:r=>r.status=='pending'?`<button class="btn s" data-a="a" data-id="${r.id}">Approve</button><button class="btn s" data-a="r" data-id="${r.id}">Reject</button>`:'-',
+ on:(a,id,draw)=>{const r=D.requests.find(x=>x.id==id),s=S(r),ap=a=='a';
+  modal(`<h3>Review request: ${esc(s.name)}</h3><p>Type: ${T(r)}</p><p>Reason: ${esc(r.reason)}</p><label>Remark (optional, max 300 chars)</label><textarea id="rm" maxlength="300"></textarea>`,[['Cancel',''],[ap?'Approve':'Reject',ap?'p':'d',()=>{
+   if(r.status!='pending'){toast('Already decided','er');return}if(/[<>]/.test($('#rm').value)){toast('Characters < and > are not allowed','er');return false}
+   r.status=ap?'approved':'rejected';r.remark=$('#rm').value.trim();if(ap){if(r.type=='branch')s.branchUnlock=true;else s.sheetUnlock=true}
+   done(D,draw,'Request '+r.status)}]])}})});
+</script></body></html>

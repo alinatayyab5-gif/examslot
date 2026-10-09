@@ -1,0 +1,7 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Assignments - ExamSlot</title><script src="../../js/theme.js"></script><link rel="stylesheet" href="../../css/style.css"></head><body><div id="app"></div><script src="../../js/data.js"></script><script src="../../js/app.js"></script><script>
+page('admin','assignments',(m,D)=>{const inc=D.students.filter(s=>s.courses.length<4).length;
+ list(m,{title:'Course Assignments',sub:'Who has 4 to 6 courses?',top:`<div style="margin-bottom:10px">${bdg(inc+' incomplete','er')} ${bdg(D.students.length-inc+' ok','ok')}</div>`,rows:()=>D.students,keys:r=>r.name+r.reg,
+ filters:[{l:'Assignment',o:['Complete','Incomplete'],f:r=>r.courses.length<4?'Incomplete':'Complete'},{l:'Program',o:[...new Set(D.students.map(s=>s.program))],f:r=>r.program},{l:'Sheet',o:['Saved','In progress','Not started','Incomplete'],f:sheetSt}],
+ cols:[['Student',r=>esc(r.name)],['Reg No',r=>r.reg],['Program',r=>r.program],['Assigned',r=>r.courses.length+' / 6'],['Assignment',r=>r.courses.length<4?bdg('Incomplete','er'):bdg('Complete','ok')],['Date sheet',r=>sheetSt(r)]],
+ act:r=>`<a class="btn s" href="assignment-manage.html?id=${r.id}">Manage</a>`})});
+</script></body></html>

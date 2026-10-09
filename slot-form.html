@@ -1,0 +1,11 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Slot Form - ExamSlot</title><script src="../../js/theme.js"></script><link rel="stylesheet" href="../../css/style.css"></head><body><div id="app"></div><script src="../../js/data.js"></script><script src="../../js/app.js"></script><script>
+page('admin','schedule',(m,D)=>{if(+Q.get('id')&&!D.slots.find(x=>x.id==+Q.get('id')))return location.href='../auth/error.html?code=404';const id=+Q.get('id'),r=D.slots.find(x=>x.id==id)||{},n=id?chosen(D,id):0,lab=c=>c.code+' - '+c.title,act=D.courses.filter(c=>c.active||c.id==r.courseId);
+ form(m,{title:id?'Edit Exam Slot':'Add Exam Slot',crumb:'Schedule > '+(id?'Edit':'Add slot'),back:'schedule.html',btn:'Save Slot',data:{...r,course:r.courseId?lab(D.courses.find(c=>c.id==r.courseId)):''},
+ extra:n?`<div class="ban w">Chosen by ${n} students: date and start time are locked. End time and seats stay editable.</div>`:'',
+ fields:[{n:'course',l:'Course',t:'select',o:act.map(lab),dis:n},{n:'date',l:'Exam date',t:'date',req:1,dis:n},{n:'start',l:'Start time',t:'time',req:1,dis:n},{n:'end',l:'End time (optional)',t:'time'},{n:'seats',l:'Seats per branch (bonus)',t:'number',req:1}],
+ save:v=>{const e={},c=act.find(x=>lab(x)==v.course),today=new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Karachi'});
+  if(!n&&v.date<today)e.date='Date cannot be in the past';if(v.end&&v.end<=v.start)e.end='End time must be after start time';if(!(+v.seats>=1))e.seats='Whole number of 1 or more';else if(+v.seats<n)e.seats='Seats cannot go below taken seats';
+  if(D.slots.some(x=>x.id!=id&&x.courseId==c.id&&x.date==v.date&&x.start==v.start))e.start='Duplicate: this course already has that date and time';if(Object.keys(e).length)return e;
+  Object.assign(r,{courseId:c.id,date:v.date,start:v.start,end:v.end,seats:+v.seats});if(!id){r.id=nid(D.slots);D.slots.push(r)}
+  done(D,0,'Slot saved');setTimeout(()=>location.href='schedule.html',700)}})});
+</script></body></html>

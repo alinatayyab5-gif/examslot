@@ -1,0 +1,10 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Schedule - ExamSlot</title><script src="../../js/theme.js"></script><link rel="stylesheet" href="../../css/style.css"></head><body><div id="app"></div><script src="../../js/data.js"></script><script src="../../js/app.js"></script><script>
+page('admin','schedule',(m,D)=>{const cc=id=>D.courses.find(c=>c.id==id),today=new Date().toISOString().slice(0,10);
+ list(m,{title:'Exam Schedule',sub:'Open exam dates and times per course',add:'slot-form.html',addL:'Add Slot',rows:()=>[...D.slots].sort((a,b)=>a.date.localeCompare(b.date)),keys:r=>cc(r.courseId).code+cc(r.courseId).title,
+ filters:[{l:'Course',o:D.courses.map(c=>c.code),f:r=>cc(r.courseId).code},{l:'From date',o:[...new Set(D.slots.map(s=>s.date))].sort(),g:(r,v)=>r.date>=v}],rc:r=>r.date<today?'cf':'',
+ cols:[['Course',r=>cc(r.courseId).code+' '+esc(cc(r.courseId).title)+(D.slots.filter(x=>x.courseId==r.courseId).length==1?' '+bdg('only 1 slot','w'):'')],['Date',r=>fd(r.date)+(r.date<today?' '+bdg('Past'):'')],['Day',r=>day(r.date)],['Start',r=>ft(r.start)],['End',r=>ft(r.end)||'-'],['Seats',r=>r.seats],['Chosen',r=>chosen(D,r.id)]],
+ act:r=>`<a class="btn s" href="slot-form.html?id=${r.id}">Edit</a><button class="btn s" data-a="d" data-id="${r.id}">Delete</button>`,
+ on:(a,id,draw)=>{const r=D.slots.find(x=>x.id==id),n=chosen(D,id);
+  if(n)return modal(`<h3>Delete this slot?</h3><p>${n} students have chosen this slot. It is protected and cannot be deleted.</p>`,[['Close',''],['Edit instead','p',()=>location.href='slot-form.html?id='+id]]);
+  delFlow('this slot','',0,()=>{D.slots=D.slots.filter(x=>x!==r);done(D,draw,'Slot deleted')})}})});
+</script></body></html>
